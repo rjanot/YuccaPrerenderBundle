@@ -13,7 +13,7 @@ This bundle is largely inspired by bakura10 work on [zfr-prerender](https://gith
 Install the module by typing (or add it to your `composer.json` file):
 
 ```sh
-$ php composer.phar require yucca/prerender-bundle
+$ php composer.phar require "yucca/prerender-bundle" "0.1.*@dev"
 ```
 
 
@@ -122,7 +122,7 @@ ZfrPrerender is configured by default to ignore all the requests for resources w
 `.iso`,
 `.flv`,
 `.m4v`,
-`.torrent`,
+`.torrent`
 . Those are never pre-rendered.
 
 You can add your own extensions using this sample configuration:
