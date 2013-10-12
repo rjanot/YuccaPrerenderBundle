@@ -101,6 +101,11 @@ class KernelListener
      */
     public function shouldPrerenderPage(Request $request)
     {
+        //if it contains _escaped_fragment_, show prerendered page
+        if(null !== $request->query->get('_escaped_fragment_')) {
+            return true;
+        }
+
         // First, return false if User Agent is not a bot
         if (!$this->isCrawler($request)) {
             return false;
