@@ -90,7 +90,7 @@ class KernelListener
         $uri    = rtrim($this->backendUrl, '/') .
             '/' . $request->getScheme().'://' . $request->getHost() . $request->getRequestUri();
 
-        $event->setResponse(new Response($this->httpClient->send($uri),418));
+        $event->setResponse(new Response($this->httpClient->send($uri),200));
     }
 
     /**
