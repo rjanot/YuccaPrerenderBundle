@@ -68,16 +68,16 @@ extent, you can customize YuccaPrerenderBundle to use your server using the foll
     yucca_prerender:
         backend_url: http://localhost:3000
 
-With this config, here is how ZfrPrerender will proxy the "https://google.com" request:
+With this config, here is how YuccaPrerender will proxy the "https://google.com" request:
 
 `GET` http://localhost:3000/https://google.com
 
 #### Crawler user-agents
 
-ZfrPrerender decides to pre-render based on the User-Agent string to check if a request comes from a bot or not. By
-default, those user agents are registered: 'baiduspider', 'facebookexternalhit'.
-Googlebot, Yahoo, and Bingbot are not in this list because you should support _escaped_fragment_ instead of
-checking user agent for those crawlers
+YuccaPrerender decides to pre-render based on the User-Agent string to check if a request comes from a bot or not. By
+default, those user agents are registered: 'googlebot', 'yahoo', 'bingbot', 'baiduspider', 'facebookexternalhit'.
+Googlebot, Yahoo, and Bingbot should not be in this list because we support _escaped_fragment_ instead of
+checking user agent for those crawlers. You have to remove them fromyour config like this if your site understands #!
 
 You can add other User-Agent string to evaluate using this sample configuration:
 
@@ -87,7 +87,7 @@ You can add other User-Agent string to evaluate using this sample configuration:
 
 #### Ignored extensions
 
-ZfrPrerender is configured by default to ignore all the requests for resources with those extensions:
+YuccaPrerender is configured by default to ignore all the requests for resources with those extensions:
 `.js`,
 `.css`,
 `.less`,
@@ -174,6 +174,6 @@ If you want to make sure your pages are rendering correctly:
 
 
 # Thanks
-Thanks to [bakura10](https://github.com/zf-fr/zfr-prerender) for the Zend Framework version.
-Thanks to [Romain Boyer](https://twitter.com/RomainBOYER) to make me discover prerender.io
-Thanks to the prerender team and all JS MVC developpers
+- Thanks to [bakura10](https://github.com/zf-fr/zfr-prerender) for the Zend Framework version.
+- Thanks to [Romain Boyer](https://twitter.com/RomainBOYER) to make me discover prerender.io
+- Thanks to the prerender team and all JS MVC developpers
