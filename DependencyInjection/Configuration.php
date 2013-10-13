@@ -69,7 +69,8 @@ class Configuration implements ConfigurationInterface
         'yahoo',
         'bingbot',
         'baiduspider',
-        'facebookexternalhit'
+        'facebookexternalhit',
+        'twitterbot'
     );
 
     /**
