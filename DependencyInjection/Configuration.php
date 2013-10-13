@@ -109,7 +109,7 @@ class Configuration implements ConfigurationInterface
                     ->example('[]')
                 ->end()
                 ->arrayNode('blacklist_urls')
-                    ->defaultValue($this->defaultIgnoredExtensions)
+                    ->defaultValue(array())
                     ->prototype('scalar')->end()
                     ->info('whitelisted urls. Not routing keys, but urls')
                     ->example('[.css,.js]')

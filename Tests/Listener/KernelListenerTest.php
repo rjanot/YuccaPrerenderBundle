@@ -3,6 +3,8 @@
 namespace Yucca\PrerenderBundle\Tests\Listener;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Yucca\PrerenderBundle\Listener\KernelListener;
 
 class KernelListenerTest extends \PHPUnit_Framework_TestCase
@@ -209,13 +211,24 @@ class KernelListenerTest extends \PHPUnit_Framework_TestCase
                 'blacklist'          => array('/users/michael'),
                 'should_prerender'   => true
             ),
+            //Test _escaped_fragment_
+            array(
+                'user_agent'         => '',
+                'host'               => 'www.example.com',
+                'uri'                => '?_escaped_fragment_=heyaImABot',
+                'referer'            => 'http://google.com',
+                'ignored_extensions' => array(),
+                'whitelist'          => array(),
+                'blacklist'          => array(),
+                'should_prerender'   => true
+            ),
         );
     }
 
     /**
      * @dataProvider shouldRenderProvider
      */
-    public function testShouldRender(
+    public function testOnKernelRequest(
         $userAgent,
         $request_host,
         $request_uri,
@@ -225,11 +238,15 @@ class KernelListenerTest extends \PHPUnit_Framework_TestCase
         $blacklist,
         $result
     ) {
+
         $request  = new Request();
         $request->headers->set('HOST', $request_host);
         $request->headers->set('User-Agent', $userAgent);
         $request->headers->set('Referer', $referer);
         $request->server->set('REQUEST_URI', $request_uri);
+
+        parse_str(parse_url($request_host.'/'.$request_uri, PHP_URL_QUERY), $query);
+        $request->query->replace($query);
 
         $httpClient = $this->getMock('Yucca\PrerenderBundle\HttpClient\ClientInterface');
 
@@ -242,6 +259,13 @@ class KernelListenerTest extends \PHPUnit_Framework_TestCase
             $httpClient
         );
 
-        $this->assertEquals($result, $listener->shouldPrerenderPage($request));
+
+        $event = new GetResponseEvent(
+            $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST
+        );
+        $listener->onKernelRequest($event);
+        $this->assertEquals($result, $event->hasResponse());
     }
 }
