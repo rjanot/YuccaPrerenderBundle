@@ -1,5 +1,7 @@
 # Yucca/PrerenderBundle
 
+[![Build Status](https://travis-ci.org/rjanot/YuccaPrerenderBundle.png?branch=master)](https://travis-ci.org/rjanot/YuccaPrerenderBundle)
+
 Backbone, EmberJS, Angular and so more are your daily basis ? In case of an admin area, that's fine, but on your front
 office, you might encounter some SEO problems
 
