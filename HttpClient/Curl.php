@@ -27,8 +27,21 @@ class Curl implements ClientInterface{
         ));
         // Send the request & save response to $resp
         $resp = curl_exec($curl);
+
+        // Check if any error occurred
+        $http_code = null;
+        if(!curl_errno($curl))
+        {
+            $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        }
+
         // Close request to clear up some resources
         curl_close($curl);
+
+        //Throw an error when not a 200
+        if(200 != $http_code) {
+            throw new \HttpResponseException('Request didn\'t run properly');
+        }
 
         return $resp;
     }
