@@ -22,7 +22,8 @@ class KernelListenerTest extends \PHPUnit_Framework_TestCase
             ),
             // Test a non-bot crawler
             array(
-                'user_agent'         => 'Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25',
+                'user_agent'         => 'Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X)'.
+                    'AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25',
                 'host'               => 'www.example.com',
                 'uri'                => '',
                 'referer'            => 'http://google.com',
@@ -44,7 +45,8 @@ class KernelListenerTest extends \PHPUnit_Framework_TestCase
             ),
             // Test a Yahoo Bot crawler
             array(
-                'user_agent'         => 'Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)',
+                'user_agent'         => 'Mozilla/5.0 (compatible; Yahoo! Slurp;'.
+                    'http://help.yahoo.com/help/us/ysearch/slurp)',
                 'host'               => 'www.example.com',
                 'uri'                => '',
                 'referer'            => 'http://google.com',
@@ -213,10 +215,18 @@ class KernelListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider shouldRenderProvider
      */
-    public function testShouldRender($userAgent, $request_host, $request_uri, $referer, $ignoredExtensions, $whitelist, $blacklist, $result)
-    {
+    public function testShouldRender(
+        $userAgent,
+        $request_host,
+        $request_uri,
+        $referer,
+        $ignoredExtensions,
+        $whitelist,
+        $blacklist,
+        $result
+    ) {
         $request  = new Request();
-        $request->headers->set('HOST',$request_host);
+        $request->headers->set('HOST', $request_host);
         $request->headers->set('User-Agent', $userAgent);
         $request->headers->set('Referer', $referer);
         $request->server->set('REQUEST_URI', $request_uri);

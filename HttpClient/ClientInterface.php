@@ -14,6 +14,7 @@ namespace Yucca\PrerenderBundle\HttpClient;
  * Interface ClientInterface
  * @package Yucca\PrerenderBundle\HttpClient
  */
-interface ClientInterface {
+interface ClientInterface
+{
     public function send($url);
-} 
+}

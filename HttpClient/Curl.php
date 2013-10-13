@@ -10,13 +10,15 @@
 
 namespace Yucca\PrerenderBundle\HttpClient;
 
-class Curl implements ClientInterface{
+class Curl implements ClientInterface
+{
     /**
      * @param $url
+     * @throws \HttpResponseException
      * @return mixed
      */
-    public function send($url) {
-
+    public function send($url)
+    {
         // Get cURL resource
         $curl = curl_init();
         // Set some options - we are passing in a useragent too here
@@ -30,8 +32,7 @@ class Curl implements ClientInterface{
 
         // Check if any error occurred
         $http_code = null;
-        if(!curl_errno($curl))
-        {
+        if (!curl_errno($curl)) {
             $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         }
 
@@ -39,10 +40,10 @@ class Curl implements ClientInterface{
         curl_close($curl);
 
         //Throw an error when not a 200
-        if(200 != $http_code) {
+        if (200 != $http_code) {
             throw new \HttpResponseException('Request didn\'t run properly');
         }
 
         return $resp;
     }
-} 
+}

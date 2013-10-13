@@ -55,8 +55,14 @@ class KernelListener
      * @param array $blacklistedUrls
      * @param ClientInterface $httpClient
      */
-    public function __construct($backendUrl, array $crawlerUserAgents, array $ignoredExtensions, array $whitelistedUrls, array $blacklistedUrls, ClientInterface $httpClient)
-    {
+    public function __construct(
+        $backendUrl,
+        array $crawlerUserAgents,
+        array $ignoredExtensions,
+        array $whitelistedUrls,
+        array $blacklistedUrls,
+        ClientInterface $httpClient
+    ) {
         $this->backendUrl = $backendUrl;
         $this->crawlerUserAgents = $crawlerUserAgents;
         $this->ignoredExtensions = $ignoredExtensions;
@@ -92,7 +98,7 @@ class KernelListener
 
         try {
             $event->setResponse(new Response($this->httpClient->send($uri), 200));
-        } catch(\HttpResponseException $e) {
+        } catch (\HttpResponseException $e) {
             // pass
         }
     }
@@ -106,7 +112,7 @@ class KernelListener
     public function shouldPrerenderPage(Request $request)
     {
         //if it contains _escaped_fragment_, show prerendered page
-        if(null !== $request->query->get('_escaped_fragment_')) {
+        if (null !== $request->query->get('_escaped_fragment_')) {
             return true;
         }
 
