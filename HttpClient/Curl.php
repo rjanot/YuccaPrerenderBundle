@@ -14,7 +14,7 @@ class Curl implements ClientInterface
 {
     /**
      * @param $url
-     * @throws \HttpResponseException
+     * @throws Exception
      * @return mixed
      */
     public function send($url)
@@ -32,6 +32,7 @@ class Curl implements ClientInterface
 
         // Check if any error occurred
         $http_code = null;
+        $error = curl_error($curl);
         if (!curl_errno($curl)) {
             $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         }
@@ -41,7 +42,7 @@ class Curl implements ClientInterface
 
         //Throw an error when not a 200
         if (200 != $http_code) {
-            throw new \HttpResponseException('Request didn\'t run properly');
+            throw new Exception('Request "'.$url.'" didn\'t run properly : '.$error);
         }
 
         return $resp;

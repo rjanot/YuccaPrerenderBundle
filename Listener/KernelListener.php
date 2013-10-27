@@ -98,7 +98,7 @@ class KernelListener
 
         try {
             $event->setResponse(new Response($this->httpClient->send($uri), 200));
-        } catch (\HttpResponseException $e) {
+        } catch (\Yucca\Prerender\HttpClient\Exception $e) {
             // pass
         }
     }
