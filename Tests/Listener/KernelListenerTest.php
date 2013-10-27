@@ -252,7 +252,7 @@ class KernelListenerTest extends \PHPUnit_Framework_TestCase
 
         $listener = new KernelListener(
             'http://prerender_backend:12345',
-            array('googlebot','yahoo','bingbot','baiduspider','facebookexternalhit'),
+            array('googlebot','yahoo','bingbot','baiduspider','facebookexternalhit','twitterbot'),
             $ignoredExtensions,
             $whitelist,
             $blacklist,
