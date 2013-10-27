@@ -57,6 +57,7 @@ class Configuration implements ConfigurationInterface
         '.flv',
         '.m4v',
         '.torrent',
+        '.xml',
     );
 
     // googlebot, yahoo, and bingbot should not be in this list because
