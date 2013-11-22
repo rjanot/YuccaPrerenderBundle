@@ -120,15 +120,17 @@ class KernelListener
 
         //Dispatch event for a more custom way of retrieving response
         $eventBefore = new RenderBeforeEvent($request);
+        // @codingStandardsIgnoreStart
         $this->eventDispatcher->dispatch(Events::onBeforeRequest, $eventBefore);
+        // @codingStandardsIgnoreEnd
 
         //Check if event get back a response
-        if($eventBefore->hasResponse()) {
+        if ($eventBefore->hasResponse()) {
             $response = $eventBefore->getResponse();
-            if(is_string($response)) {
+            if (is_string($response)) {
                 $event->setResponse(new Response($response, 200));
                 return true;
-            } elseif($response instanceof Response) {
+            } elseif ($response instanceof Response) {
                 $event->setResponse($response);
                 return true;
             }
@@ -145,9 +147,11 @@ class KernelListener
         }
 
         //Dispatch event to save response
-        if($event->getResponse()) {
+        if ($event->getResponse()) {
             $eventAfter = new RenderAfterEvent($request, $event->getResponse());
+            // @codingStandardsIgnoreStart
             $this->eventDispatcher->dispatch(Events::onAfterRequest, $eventAfter);
+            // @codingStandardsIgnoreEnd
         }
 
         return true;

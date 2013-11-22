@@ -11,6 +11,8 @@ namespace Yucca\PrerenderBundle;
 
 final class Events
 {
+    // @codingStandardsIgnoreStart
     const onBeforeRequest = 'yucca_prerender.render.before';
     const onAfterRequest = 'yucca_prerender.render.after';
+    // @codingStandardsIgnoreEnd
 }
