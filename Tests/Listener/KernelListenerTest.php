@@ -249,6 +249,7 @@ class KernelListenerTest extends \PHPUnit_Framework_TestCase
         $request->query->replace($query);
 
         $httpClient = $this->getMock('Yucca\PrerenderBundle\HttpClient\ClientInterface');
+        $eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcher');
 
         $listener = new KernelListener(
             'http://prerender_backend:12345',
@@ -256,7 +257,8 @@ class KernelListenerTest extends \PHPUnit_Framework_TestCase
             $ignoredExtensions,
             $whitelist,
             $blacklist,
-            $httpClient
+            $httpClient,
+            $eventDispatcher
         );
 
 

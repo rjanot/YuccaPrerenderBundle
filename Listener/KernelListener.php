@@ -10,9 +10,13 @@
 
 namespace Yucca\PrerenderBundle\Listener;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\Response;
+use Yucca\PrerenderBundle\Event\RenderAfterEvent;
+use Yucca\PrerenderBundle\Event\RenderBeforeEvent;
+use Yucca\PrerenderBundle\Events;
 use Yucca\PrerenderBundle\HttpClient\ClientInterface;
 
 class KernelListener
@@ -48,6 +52,11 @@ class KernelListener
     protected $httpClient;
 
     /**
+     * @var EventDispatcher
+     */
+    protected $eventDispatcher;
+
+    /**
      * @param string $backendUrl
      * @param array $crawlerUserAgents
      * @param array $ignoredExtensions
@@ -61,7 +70,8 @@ class KernelListener
         array $ignoredExtensions,
         array $whitelistedUrls,
         array $blacklistedUrls,
-        ClientInterface $httpClient
+        ClientInterface $httpClient,
+        EventDispatcher $eventDispatcher
     ) {
         $this->backendUrl = $backendUrl;
         $this->crawlerUserAgents = $crawlerUserAgents;
@@ -69,6 +79,7 @@ class KernelListener
         $this->whitelistedUrls = $whitelistedUrls;
         $this->blacklistedUrls = $blacklistedUrls;
         $this->setHttpClient($httpClient);
+        $this->setEventDispatcher($eventDispatcher);
     }
 
     /**
@@ -82,25 +93,64 @@ class KernelListener
         $this->httpClient = $httpClient;
     }
 
+    /**
+     * Set the Event Dispatcher
+     *
+     * @param  EventDispatcher $eventDispatcher
+     * @return void
+     */
+    public function setEventDispatcher(EventDispatcher $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
+    /**
+     * @param GetResponseEvent $event
+     * @return bool
+     */
     public function onKernelRequest(GetResponseEvent $event)
     {
+        //Check if we have to prerender page
         $request = $event->getRequest();
-
         if (!$this->shouldPrerenderPage($request)) {
-            return null;
+            return false;
         }
-
 
         $event->stopPropagation();
 
+        //Dispatch event for a more custom way of retrieving response
+        $eventBefore = new RenderBeforeEvent($request);
+        $this->eventDispatcher->dispatch(Events::onBeforeRequest, $eventBefore);
+
+        //Check if event get back a response
+        if($eventBefore->hasResponse()) {
+            $response = $eventBefore->getResponse();
+            if(is_string($response)) {
+                $event->setResponse(new Response($response, 200));
+                return true;
+            } elseif($response instanceof Response) {
+                $event->setResponse($response);
+                return true;
+            }
+        }
+
+        //Launch prerender
         $uri    = rtrim($this->backendUrl, '/') .
             '/' . $request->getScheme().'://' . $request->getHost() . $request->getRequestUri();
 
         try {
             $event->setResponse(new Response($this->httpClient->send($uri), 200));
-        } catch (\Yucca\Prerender\HttpClient\Exception $e) {
+        } catch (\Yucca\PrerenderBundle\HttpClient\Exception $e) {
             // pass
         }
+
+        //Dispatch event to save response
+        if($event->getResponse()) {
+            $eventAfter = new RenderAfterEvent($request, $event->getResponse());
+            $this->eventDispatcher->dispatch(Events::onAfterRequest, $eventAfter);
+        }
+
+        return true;
     }
 
     /**
