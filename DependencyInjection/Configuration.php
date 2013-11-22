@@ -63,12 +63,13 @@ class Configuration implements ConfigurationInterface
     // googlebot, yahoo, and bingbot should not be in this list because
     // we support _escaped_fragment_ instead of checking user
     // agent for those crawlers
-    // By the way, if you doesn't have time to put hashbang to your urls, it will do the job for you
-    // but you really have to change it !
+    // By the way, if you doesn't have time to put hashbang to your urls,
+    // you can add them in your configuration
+    // But no guarantees about cloaking effects !
     protected $defaultCrawlerUserAgents = array(
-        'googlebot',
-        'yahoo',
-        'bingbot',
+        //'googlebot',
+        //'yahoo',
+        //'bingbot',
         'baiduspider',
         'facebookexternalhit',
         'twitterbot'

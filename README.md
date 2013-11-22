@@ -78,10 +78,10 @@ With this config, here is how YuccaPrerender will proxy the "https://google.com"
 #### Crawler user-agents
 
 YuccaPrerender decides to pre-render based on the User-Agent string to check if a request comes from a bot or not. By
-default, those user agents are registered: 'googlebot', 'yahoo', 'bingbot', 'baiduspider', 'facebookexternalhit',
+default, those user agents are registered: 'baiduspider', 'facebookexternalhit',
 'twitterbot'.
 Googlebot, Yahoo, and Bingbot should not be in this list because we support _escaped_fragment_ instead of
-checking user agent for those crawlers. You have to remove them fromyour config like this if your site understands #!
+checking user agent for those crawlers. Your site must have to understand the '#!' ajax url notation.
 
 You can add other User-Agent string to evaluate using this sample configuration:
 
