@@ -10,7 +10,7 @@
 
 namespace Yucca\PrerenderBundle\Listener;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\Response;
@@ -52,7 +52,7 @@ class KernelListener
     protected $httpClient;
 
     /**
-     * @var EventDispatcher
+     * @var EventDispatcherInterface
      */
     protected $eventDispatcher;
 
@@ -71,7 +71,7 @@ class KernelListener
         array $whitelistedUrls,
         array $blacklistedUrls,
         ClientInterface $httpClient,
-        EventDispatcher $eventDispatcher
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->backendUrl = $backendUrl;
         $this->crawlerUserAgents = $crawlerUserAgents;
@@ -96,10 +96,10 @@ class KernelListener
     /**
      * Set the Event Dispatcher
      *
-     * @param  EventDispatcher $eventDispatcher
+     * @param  EventDispatcherInterface $eventDispatcher
      * @return void
      */
-    public function setEventDispatcher(EventDispatcher $eventDispatcher)
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
     }
