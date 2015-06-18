@@ -14,6 +14,7 @@
         <service id="kernel.listener.yucca_prerender" class="%kernel.listener.yucca_prerender.class%">
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
             <argument>%yucca_prerender.backend_url%</argument>
+            <argument>%yucca_prerender.force_scheme%</argument>
             <argument>%yucca_prerender.crawler_user_agents%</argument>
             <argument>%yucca_prerender.ignored_extensions%</argument>
             <argument>%yucca_prerender.whitelist_urls%</argument>

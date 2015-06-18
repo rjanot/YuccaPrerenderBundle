@@ -62,7 +62,7 @@ class KernelListener
 
     /**
      * @param string $backendUrl
-     * @param $forceSecureRedirect
+     * @param null|bool $forceSecureRedirect
      * @param array $crawlerUserAgents
      * @param array $ignoredExtensions
      * @param array $whitelistedUrls
