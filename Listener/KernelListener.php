@@ -25,6 +25,10 @@ class KernelListener
      * @var string
      */
     protected $backendUrl;
+    /**
+     * @var null|bool
+     */
+    protected $forceSecureRedirect;
 
     /**
      * @var array
@@ -58,14 +62,17 @@ class KernelListener
 
     /**
      * @param string $backendUrl
+     * @param $forceSecureRedirect
      * @param array $crawlerUserAgents
      * @param array $ignoredExtensions
      * @param array $whitelistedUrls
      * @param array $blacklistedUrls
      * @param ClientInterface $httpClient
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         $backendUrl,
+        $forceSecureRedirect,
         array $crawlerUserAgents,
         array $ignoredExtensions,
         array $whitelistedUrls,
@@ -74,6 +81,7 @@ class KernelListener
         EventDispatcherInterface $eventDispatcher
     ) {
         $this->backendUrl = $backendUrl;
+        $this->forceSecureRedirect = $forceSecureRedirect;
         $this->crawlerUserAgents = $crawlerUserAgents;
         $this->ignoredExtensions = $ignoredExtensions;
         $this->whitelistedUrls = $whitelistedUrls;
@@ -137,8 +145,13 @@ class KernelListener
         }
 
         //Launch prerender
-        $uri    = rtrim($this->backendUrl, '/') .
-            '/' . $request->getScheme().'://' . $request->getHost() . $request->getRequestUri();
+        if ($this->forceSecureRedirect === null) {
+            $scheme = $request->getScheme();
+        } else {
+            $scheme = $this->forceSecureRedirect ? 'https' : 'http';
+        }
+        $uri = rtrim($this->backendUrl, '/') . '/'
+             . $scheme . '://' . $request->getHost() . $request->getRequestUri();
 
         try {
             $event->setResponse(new Response($this->httpClient->send($uri), 200));
