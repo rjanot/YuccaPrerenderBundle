@@ -93,7 +93,7 @@ class Configuration implements ConfigurationInterface
                     ->info('url of the prerender backend')
                     ->example('http://prerender.herokuapp.com')
                 ->end()
-                ->arrayNode('force_secure_redirect')
+                ->scalarNode('force_secure_redirect')
                     ->defaultNull()
                     ->prototype('scalar')->end()
                     ->info('replace protocol. https - true, http - false, current - null')
