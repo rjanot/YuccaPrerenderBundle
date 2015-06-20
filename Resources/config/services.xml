@@ -14,13 +14,13 @@
         <service id="kernel.listener.yucca_prerender" class="%kernel.listener.yucca_prerender.class%">
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
             <argument>%yucca_prerender.backend_url%</argument>
-            <argument>%yucca_prerender.force_scheme%</argument>
             <argument>%yucca_prerender.crawler_user_agents%</argument>
             <argument>%yucca_prerender.ignored_extensions%</argument>
             <argument>%yucca_prerender.whitelist_urls%</argument>
             <argument>%yucca_prerender.blacklist_urls%</argument>
             <argument type="service" id="yucca_prerender.http_client.curl"/>
             <argument type="service" id="event_dispatcher"/>
+            <argument>%yucca_prerender.force_scheme%</argument>
         </service>
     </services>
 </container>

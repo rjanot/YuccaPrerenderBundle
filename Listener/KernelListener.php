@@ -72,13 +72,13 @@ class KernelListener
      */
     public function __construct(
         $backendUrl,
-        $forceSecureRedirect,
         array $crawlerUserAgents,
         array $ignoredExtensions,
         array $whitelistedUrls,
         array $blacklistedUrls,
         ClientInterface $httpClient,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        $forceSecureRedirect
     ) {
         $this->backendUrl = $backendUrl;
         $this->forceSecureRedirect = $forceSecureRedirect;

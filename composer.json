@@ -1,5 +1,5 @@
 {
-    "name": "werkint/prerender-bundle",
+    "name": "yucca/prerender-bundle",
     "type": "symfony-bundle",
     "description": "Allows you to easily use prerender for your Symfony2 apps running Client-Side MVC",
     "keywords": ["prerender","MVC js"],

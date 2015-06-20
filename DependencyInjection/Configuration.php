@@ -89,7 +89,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('backend_url')
-                    ->defaultValue('http://localhost:3000')
+                    ->defaultValue('http://prerender.herokuapp.com')
                     ->info('url of the prerender backend')
                     ->example('http://prerender.herokuapp.com')
                 ->end()
