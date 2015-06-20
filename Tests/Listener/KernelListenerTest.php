@@ -258,7 +258,8 @@ class KernelListenerTest extends \PHPUnit_Framework_TestCase
             $whitelist,
             $blacklist,
             $httpClient,
-            $eventDispatcher
+            $eventDispatcher,
+            false
         );
 
 
