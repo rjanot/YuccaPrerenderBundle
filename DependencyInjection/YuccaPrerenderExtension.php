@@ -34,6 +34,7 @@ class YuccaPrerenderExtension extends Extension
         $loader->load('services.xml');
 
         $container->setParameter('yucca_prerender.backend_url', $config['backend_url']);
+        $container->setParameter('yucca_prerender.token', $config['token']);
         $container->setParameter('yucca_prerender.force_scheme', $config['force_scheme']);
         $container->setParameter('yucca_prerender.crawler_user_agents', $config['crawler_user_agents']);
         $container->setParameter('yucca_prerender.ignored_extensions', $config['ignored_extensions']);

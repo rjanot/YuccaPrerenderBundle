@@ -12,12 +12,15 @@ namespace Yucca\PrerenderBundle\HttpClient;
 
 class Curl implements ClientInterface
 {
+
     /**
-     * @param $url
-     * @throws Exception
+     * @param        $url
+     * @param string $token
+     *
      * @return mixed
+     * @throws Exception
      */
-    public function send($url)
+    public function send($url, $token = '')
     {
         // Get cURL resource
         $curl = curl_init();
@@ -27,6 +30,13 @@ class Curl implements ClientInterface
             CURLOPT_URL => $url,
             CURLOPT_USERAGENT => 'Internal-UserAgent'
         ));
+
+        if (!empty($token)) {
+            curl_setopt( $curl, CURLOPT_HTTPHEADER, array(
+                'X-Prerender-Token: ' . $token
+            ) );
+        }
+
         // Send the request & save response to $resp
         $resp = curl_exec($curl);
 

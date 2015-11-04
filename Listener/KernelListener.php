@@ -25,6 +25,12 @@ class KernelListener
      * @var string
      */
     protected $backendUrl;
+
+    /**
+     * @var string
+     */
+    protected $token;
+
     /**
      * @var null|bool
      */
@@ -61,17 +67,19 @@ class KernelListener
     protected $eventDispatcher;
 
     /**
-     * @param string $backendUrl
-     * @param null|bool $forceSecureRedirect
-     * @param array $crawlerUserAgents
-     * @param array $ignoredExtensions
-     * @param array $whitelistedUrls
-     * @param array $blacklistedUrls
-     * @param ClientInterface $httpClient
+     * @param string                   $backendUrl
+     * @param string                   $token
+     * @param array                    $crawlerUserAgents
+     * @param array                    $ignoredExtensions
+     * @param array                    $whitelistedUrls
+     * @param array                    $blacklistedUrls
+     * @param ClientInterface          $httpClient
      * @param EventDispatcherInterface $eventDispatcher
+     * @param null|bool                $forceSecureRedirect
      */
     public function __construct(
         $backendUrl,
+        $token,
         array $crawlerUserAgents,
         array $ignoredExtensions,
         array $whitelistedUrls,
@@ -81,6 +89,7 @@ class KernelListener
         $forceSecureRedirect
     ) {
         $this->backendUrl = $backendUrl;
+        $this->token = $token;
         $this->forceSecureRedirect = $forceSecureRedirect;
         $this->crawlerUserAgents = $crawlerUserAgents;
         $this->ignoredExtensions = $ignoredExtensions;
@@ -154,7 +163,7 @@ class KernelListener
              . $scheme . '://' . $request->getHost() . $request->getRequestUri();
 
         try {
-            $event->setResponse(new Response($this->httpClient->send($uri), 200));
+            $event->setResponse(new Response($this->httpClient->send($uri, $this->token), 200));
         } catch (\Yucca\PrerenderBundle\HttpClient\Exception $e) {
             // pass
         }
