@@ -89,9 +89,9 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('backend_url')
-                    ->defaultValue('http://prerender.herokuapp.com')
+                    ->defaultValue('http://service.prerender.io')
                     ->info('url of the prerender backend')
-                    ->example('http://prerender.herokuapp.com')
+                    ->example('http://service.prerender.io')
                 ->end()
                 ->scalarNode('force_scheme')
                     ->defaultNull()
