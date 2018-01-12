@@ -1,7 +1,7 @@
 {
     "name": "yucca/prerender-bundle",
     "type": "symfony-bundle",
-    "description": "Allows you to easily use prerender for your Symfony2 apps running Client-Side MVC",
+    "description": "Allows you to easily use prerender for your Symfony apps running Client-Side MVC",
     "keywords": ["prerender","MVC js"],
     "homepage": "http://rjanot.github.io/",
     "license": "MIT",
@@ -12,8 +12,8 @@
         }
     ],
     "require": {
-        "php": ">=5.3.2",
-        "symfony/framework-bundle": "~2.3",
+        "php": ">=7",
+        "symfony/framework-bundle": "~2.3|~3",
         "psr/log": "~1.0"
     },
     "require-dev": {
