@@ -28,7 +28,8 @@ class Curl implements ClientInterface
         curl_setopt_array($curl, array(
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_URL => $url,
-            CURLOPT_USERAGENT => 'Internal-UserAgent'
+            CURLOPT_USERAGENT => 'Internal-UserAgent',
+            CURLOPT_HEADER => 1
         ));
 
         if (!empty($token)) {
@@ -38,23 +39,26 @@ class Curl implements ClientInterface
         }
 
         // Send the request & save response to $resp
-        $resp = curl_exec($curl);
+        $response = curl_exec($curl);
+        $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
+        $header = substr($response, 0, $headerSize);
+        $body = substr($response, $headerSize);
 
         // Check if any error occurred
-        $http_code = null;
+        $httpCode = null;
         $error = curl_error($curl);
         if (!curl_errno($curl)) {
-            $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         }
 
         // Close request to clear up some resources
         curl_close($curl);
 
         //Throw an error when not a 200
-        if (200 != $http_code) {
-            throw new Exception('Request "'.$url.'" didn\'t run properly : '.$error);
+        if (200 != $httpCode) {
+            throw new Exception('Request "'.$url.'" didn\'t run properly : '.$error, (int)$httpCode, null, $header, $body);
         }
 
-        return $resp;
+        return $body;
     }
 }

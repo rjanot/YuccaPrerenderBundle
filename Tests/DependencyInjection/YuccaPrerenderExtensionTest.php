@@ -9,11 +9,12 @@
 namespace Yucca\PrerenderBundle\Tests\DependencyInjection;
 
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Yucca\PrerenderBundle\DependencyInjection\Configuration;
 use Yucca\PrerenderBundle\DependencyInjection\YuccaPrerenderExtension;
 
-class YuccaPrerenderExtensionTest extends \PHPUnit_Framework_TestCase
+class YuccaPrerenderExtensionTest extends TestCase
 {
     protected $containerBuilder;
 
@@ -57,7 +58,7 @@ class YuccaPrerenderExtensionTest extends \PHPUnit_Framework_TestCase
         $extension = new YuccaPrerenderExtension();
         $extension->load(array(), $this->containerBuilder);
 
-        $this->assertParameter('http://prerender.herokuapp.com', 'yucca_prerender.backend_url');
+        $this->assertParameter('http://service.prerender.io', 'yucca_prerender.backend_url');
         $this->assertParameter($defaultCrawlerUserAgents, 'yucca_prerender.crawler_user_agents');
         $this->assertParameter($defaultIgnoredExtensions, 'yucca_prerender.ignored_extensions');
         $this->assertParameter(array(), 'yucca_prerender.whitelist_urls');

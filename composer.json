@@ -13,22 +13,17 @@
     ],
     "require": {
         "php": ">=7",
-        "symfony/framework-bundle": "~2.3|~3",
+        "symfony/framework-bundle": "~3.3",
         "psr/log": "~1.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "~3.7",
+        "phpunit/phpunit": "^6.5",
         "squizlabs/php_codesniffer": "1.4.*",
         "satooshi/php-coveralls": "~0.6"
     },
     "autoload": {
         "psr-0": { "Yucca\\PrerenderBundle": "" }
     },
-    "minimum-stability": "dev",
-    "target-dir": "Yucca/PrerenderBundle",
-    "extra": {
-        "branch-alias": {
-            "dev-master": "0.1-dev"
-        }
-    }
+    "minimum-stability": "stable",
+    "target-dir": "Yucca/PrerenderBundle"
 }

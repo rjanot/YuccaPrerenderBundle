@@ -7,21 +7,27 @@
     <parameters>
         <parameter key="kernel.listener.yucca_prerender.class">Yucca\PrerenderBundle\Listener\KernelListener</parameter>
         <parameter key="yucca_prerender.http_client.curl.class">Yucca\PrerenderBundle\HttpClient\Curl</parameter>
+        <parameter key="yucca_prerender.rules.should_prerender.class">Yucca\PrerenderBundle\Rules\ShouldPrerender</parameter>
     </parameters>
 
     <services>
         <service id="yucca_prerender.http_client.curl" class="%yucca_prerender.http_client.curl.class%"/>
-        <service id="kernel.listener.yucca_prerender" class="%kernel.listener.yucca_prerender.class%">
-            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
-            <argument>%yucca_prerender.backend_url%</argument>
-            <argument>%yucca_prerender.token%</argument>
+
+        <service id="yucca_prerender.rules.should_prerender" class="%yucca_prerender.rules.should_prerender.class%">
             <argument>%yucca_prerender.crawler_user_agents%</argument>
             <argument>%yucca_prerender.ignored_extensions%</argument>
             <argument>%yucca_prerender.whitelist_urls%</argument>
             <argument>%yucca_prerender.blacklist_urls%</argument>
+        </service>
+
+        <service id="kernel.listener.yucca_prerender" class="%kernel.listener.yucca_prerender.class%">
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
+            <argument>%yucca_prerender.backend_url%</argument>
+            <argument>%yucca_prerender.token%</argument>
             <argument type="service" id="yucca_prerender.http_client.curl"/>
             <argument type="service" id="event_dispatcher"/>
             <argument>%yucca_prerender.force_scheme%</argument>
+            <argument type="service" id="yucca_prerender.rules.should_prerender"/>
         </service>
     </services>
 </container>

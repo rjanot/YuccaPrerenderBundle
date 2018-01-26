@@ -16,8 +16,10 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\Response;
 use Yucca\PrerenderBundle\Event\RenderAfterEvent;
 use Yucca\PrerenderBundle\Event\RenderBeforeEvent;
+use Yucca\PrerenderBundle\Event\ShouldPrerenderEvent;
 use Yucca\PrerenderBundle\Events;
 use Yucca\PrerenderBundle\HttpClient\ClientInterface;
+use Yucca\PrerenderBundle\Rules\ShouldPrerender;
 
 class KernelListener
 {
@@ -37,26 +39,6 @@ class KernelListener
     protected $forceSecureRedirect;
 
     /**
-     * @var array
-     */
-    protected $ignoredExtensions;
-
-    /**
-     * @var array
-     */
-    protected $whitelistedUrls;
-
-    /**
-     * @var array
-     */
-    protected $blacklistedUrls;
-
-    /**
-     * @var array
-     */
-    protected $crawlerUserAgents;
-
-    /**
      * @var ClientInterface
      */
     protected $httpClient;
@@ -67,36 +49,29 @@ class KernelListener
     protected $eventDispatcher;
 
     /**
+     * KernelListener constructor.
+     *
      * @param string                   $backendUrl
      * @param string                   $token
-     * @param array                    $crawlerUserAgents
-     * @param array                    $ignoredExtensions
-     * @param array                    $whitelistedUrls
-     * @param array                    $blacklistedUrls
      * @param ClientInterface          $httpClient
      * @param EventDispatcherInterface $eventDispatcher
-     * @param null|bool                $forceSecureRedirect
+     * @param bool                     $forceSecureRedirect
+     * @param ShouldPrerender          $rules
      */
     public function __construct(
         $backendUrl,
         $token,
-        array $crawlerUserAgents,
-        array $ignoredExtensions,
-        array $whitelistedUrls,
-        array $blacklistedUrls,
         ClientInterface $httpClient,
         EventDispatcherInterface $eventDispatcher,
-        $forceSecureRedirect
+        $forceSecureRedirect,
+        ShouldPrerender $rules
     ) {
         $this->backendUrl = $backendUrl;
         $this->token = $token;
         $this->forceSecureRedirect = $forceSecureRedirect;
-        $this->crawlerUserAgents = $crawlerUserAgents;
-        $this->ignoredExtensions = $ignoredExtensions;
-        $this->whitelistedUrls = $whitelistedUrls;
-        $this->blacklistedUrls = $blacklistedUrls;
         $this->setHttpClient($httpClient);
         $this->setEventDispatcher($eventDispatcher);
+        $this->rules = $rules;
     }
 
     /**
@@ -127,16 +102,37 @@ class KernelListener
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
-        //Check if we have to prerender page
         $request = $event->getRequest();
-        if (!$this->shouldPrerenderPage($request)) {
+
+        if (!$event->isMasterRequest()) {
+            return false;
+        }
+
+        //Check if we have to prerender page
+        $eventshouldPrerender = new ShouldPrerenderEvent($request);
+        $this->eventDispatcher->dispatch(Events::shouldPrerenderPage, $eventshouldPrerender);
+
+        $shouldPrerender = $eventshouldPrerender->getShouldPrerender();
+        if (is_null($shouldPrerender)) {
+            //Check if we have to prerender page
+            if (!$this->rules->shouldPrerenderPage($request)) {
+                return false;
+            }
+        } elseif (false === $shouldPrerender) {
             return false;
         }
 
         $event->stopPropagation();
 
         //Dispatch event for a more custom way of retrieving response
-        $eventBefore = new RenderBeforeEvent($request);
+        if ($this->forceSecureRedirect === null) {
+            $scheme = $request->getScheme();
+        } else {
+            $scheme = $this->forceSecureRedirect ? 'https' : 'http';
+        }
+        $uri = rtrim($this->backendUrl, '/').'/'.$scheme.'://'.$request->getHost().$request->getRequestUri();
+
+        $eventBefore = new RenderBeforeEvent($request, $uri);
         // @codingStandardsIgnoreStart
         $this->eventDispatcher->dispatch(Events::onBeforeRequest, $eventBefore);
         // @codingStandardsIgnoreEnd
@@ -146,24 +142,19 @@ class KernelListener
             $response = $eventBefore->getResponse();
             if (is_string($response)) {
                 $event->setResponse(new Response($response, 200));
+
                 return true;
             } elseif ($response instanceof Response) {
                 $event->setResponse($response);
+
                 return true;
             }
         }
 
-        //Launch prerender
-        if ($this->forceSecureRedirect === null) {
-            $scheme = $request->getScheme();
-        } else {
-            $scheme = $this->forceSecureRedirect ? 'https' : 'http';
-        }
-        $uri = rtrim($this->backendUrl, '/') . '/'
-             . $scheme . '://' . $request->getHost() . $request->getRequestUri();
 
+        //Launch prerender
         try {
-            $event->setResponse(new Response($this->httpClient->send($uri, $this->token), 200));
+            $event->setResponse(new Response($this->httpClient->send($eventBefore->getPrerenderUrl(), $this->token), 200));
         } catch (\Yucca\PrerenderBundle\HttpClient\Exception $e) {
             // pass
         }
@@ -171,117 +162,9 @@ class KernelListener
         //Dispatch event to save response
         if ($event->getResponse()) {
             $eventAfter = new RenderAfterEvent($request, $event->getResponse());
-            // @codingStandardsIgnoreStart
             $this->eventDispatcher->dispatch(Events::onAfterRequest, $eventAfter);
-            // @codingStandardsIgnoreEnd
         }
 
         return true;
-    }
-
-    /**
-     * Is this request should be a prerender request?
-     *
-     * @param Request $request
-     * @return bool
-     */
-    public function shouldPrerenderPage(Request $request)
-    {
-        //if it contains _escaped_fragment_, show prerendered page
-        if (null !== $request->query->get('_escaped_fragment_')) {
-            return true;
-        }
-
-        // First, return false if User Agent is not a bot
-        if (!$this->isCrawler($request)) {
-            return false;
-        }
-
-        $uri = $request->getScheme().'://' . $request->getHost() . $request->getRequestUri();
-
-        // Then, return false if URI string contains an ignored extension
-        foreach ($this->ignoredExtensions as $ignoredExtension) {
-            if (strpos($uri, $ignoredExtension) !== false) {
-                return false;
-            }
-        }
-
-        // Then, return true if it is whitelisted (only if whitelist contains data)
-        $whitelistUrls = $this->whitelistedUrls;
-
-        if (!empty($whitelistUrls) && !$this->isWhitelisted($uri, $whitelistUrls)) {
-            return false;
-        }
-
-        // Finally, return false if it is blacklisted (or the referer)
-        $referer       = $request->headers->get('Referer');
-        $blacklistUrls = $this->blacklistedUrls;
-
-        if (!empty($blacklistUrls) && $this->isBlacklisted($uri, $referer, $blacklistUrls)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Check if the request is made from a crawler
-     *
-     * @param  Request $request
-     * @return bool
-     */
-    protected function isCrawler(Request $request)
-    {
-        $userAgent = strtolower($request->headers->get('User-Agent'));
-
-        foreach ($this->crawlerUserAgents as $crawlerUserAgent) {
-            if (strpos($userAgent, strtolower($crawlerUserAgent)) !== false) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Check if the request is whitelisted
-     *
-     * @param  string $uri
-     * @param  array $whitelistUrls
-     * @return bool
-     */
-    protected function isWhitelisted($uri, array $whitelistUrls)
-    {
-        foreach ($whitelistUrls as $whitelistUrl) {
-            $match = preg_match('`' . $whitelistUrl . '`i', $uri);
-
-            if ($match > 0) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Check if the request is blacklisted
-     *
-     * @param  string $uri
-     * @param  string $referer
-     * @param  array $blacklistUrls
-     * @return bool
-     */
-    protected function isBlacklisted($uri, $referer, array $blacklistUrls)
-    {
-        foreach ($blacklistUrls as $blacklistUrl) {
-            $pattern = '`' . $blacklistUrl . '`i';
-            $match   = preg_match($pattern, $uri) + preg_match($pattern, $referer);
-
-            if ($match > 0) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

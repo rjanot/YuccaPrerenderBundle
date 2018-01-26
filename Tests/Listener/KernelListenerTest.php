@@ -2,12 +2,14 @@
 
 namespace Yucca\PrerenderBundle\Tests\Listener;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Yucca\PrerenderBundle\Listener\KernelListener;
+use Yucca\PrerenderBundle\Rules\ShouldPrerender;
 
-class KernelListenerTest extends \PHPUnit_Framework_TestCase
+class KernelListenerTest extends TestCase
 {
     public function shouldRenderProvider()
     {
@@ -248,23 +250,28 @@ class KernelListenerTest extends \PHPUnit_Framework_TestCase
         parse_str(parse_url($request_host.'/'.$request_uri, PHP_URL_QUERY), $query);
         $request->query->replace($query);
 
-        $httpClient = $this->getMock('Yucca\PrerenderBundle\HttpClient\ClientInterface');
-        $eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcher');
+        $httpClient = $this->createMock(\Yucca\PrerenderBundle\HttpClient\ClientInterface::class);
+        $eventDispatcher = $this->createMock(\Symfony\Component\EventDispatcher\EventDispatcher::class);
 
-        $listener = new KernelListener(
-            'http://prerender_backend:12345',
+        $shouldPrerenderRules = new ShouldPrerender(
             array('googlebot','yahoo','bingbot','baiduspider','facebookexternalhit','twitterbot'),
             $ignoredExtensions,
             $whitelist,
-            $blacklist,
+            $blacklist
+        );
+
+        $listener = new KernelListener(
+            'http://prerender_backend:12345',
+            'null',
             $httpClient,
             $eventDispatcher,
-            false
+            false,
+            $shouldPrerenderRules
         );
 
 
         $event = new GetResponseEvent(
-            $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
+            $this->createMock(\Symfony\Component\HttpKernel\HttpKernelInterface::class),
             $request,
             HttpKernelInterface::MASTER_REQUEST
         );

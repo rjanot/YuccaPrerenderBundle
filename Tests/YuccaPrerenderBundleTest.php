@@ -9,9 +9,10 @@
 namespace Yucca\PrerenderBundle\Tests;
 
 
+use PHPUnit\Framework\TestCase;
 use Yucca\PrerenderBundle\YuccaPrerenderBundle;
 
-class YuccaPrerenderBundleTest extends \PHPUnit_Framework_TestCase
+class YuccaPrerenderBundleTest extends TestCase
 {
     public function testGetName()
     {

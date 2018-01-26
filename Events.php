@@ -9,9 +9,14 @@
  */
 namespace Yucca\PrerenderBundle;
 
+/**
+ * Class Events
+ * @package Yucca\PrerenderBundle
+ */
 final class Events
 {
     // @codingStandardsIgnoreStart
+    const shouldPrerenderPage = 'yucca_prerender.should_prerender';
     const onBeforeRequest = 'yucca_prerender.render.before';
     const onAfterRequest = 'yucca_prerender.render.after';
     // @codingStandardsIgnoreEnd
