@@ -13,8 +13,7 @@ class CurlTest extends TestCase
         $curlClient = new Curl();
         $this->assertInstanceOf('Yucca\PrerenderBundle\HttpClient\ClientInterface', $curlClient);
 
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Request "http://www.example.com" didn\'t run properly : Could not resolve host: www.example.com');
         $resp = $curlClient->send('http://www.example.com');
+        $this->assertContains('<title>Example Domain</title>', $resp);
     }
 }
